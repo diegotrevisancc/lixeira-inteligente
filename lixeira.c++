@@ -21,6 +21,7 @@ void setup()
 
 void loop()
 {
+    //int volumeLixeira = largura * comprimento * altura;
     int contador = 0;
     while (contador < 24) {
     Serial.println("-------");
@@ -38,7 +39,7 @@ void loop()
     Serial.println(" Litros");
 
     float volumeOcupado = leituraUm - leituraDois;
-    float volumeOcupadoPorCento = (volumeOcupado * 100)/leituraUm;
+    //float volumeOcupadoPorCento = (volumeOcupado * 100)/volumeLixeira;
 
     // configLCD
     lcd.setCursor(0, 0);
@@ -47,6 +48,7 @@ void loop()
     lcd.setCursor(9, 0);
     lcd.print(volumeOcupadoPorCento);
     }
+    contador++;
 
 }
 
