@@ -1,77 +1,81 @@
 #include <LiquidCrystal.h>
 
+
 LiquidCrystal lcd(12, 9, 5, 4, 3, 2);
 
-float const echo = 10;
-float const trig = 11;
-float altSensor;
-long duracao;
+float const echo=10;
+float const trig=11;
 
-float altVariavel;
+float const echo2 = 7;
+float const trig2 = 6;
 
+double altura, leituraUm, leituraDois, duracao;
 
-void setup()
-{
-    lcd.begin(16, 2);
-    lcd.clear();
-    pinMode(echo, INPUT);
-    pinMode(trig, OUTPUT);
-    Serial.begin(9600);
+double larguraCaixa = 30; 
+double comprimentoCaixa = 20;
+double alturaCaixa = 40;
+long alturaLida;
+void setup(){
+	lcd.begin(16,2);
+	lcd.clear(); 
+	pinMode(echo, INPUT);
+	pinMode(trig,OUTPUT);
+    pinMode(echo2, INPUT);
+	pinMode(trig2,OUTPUT);
+	Serial.begin(9600);
 }
 
-void loop()
-{
-    //int volumeLixeira = largura * comprimento * altura;
-    int contador = 0;
-    while (contador < 24) {
-    Serial.println("-------");
-    Serial.println("-------");
-    float leituraUm = volumeLixeira(2.0, 1.5, 2.0);
-    Serial.println("Leitura 1: ");
-    Serial.print(leituraUm);
-    Serial.println("m3");
 
-    delay(6000); // Tempo para próxima leitura
+void loop(){
+    leituraUm = alturaUm();
+    leituraDois = alturaDois();
+    
+    double volumeUm = calculaVolume(leituraUm);
+    double volumeDois = calculaVolume(leituraDois);
 
-    float leituraDois = volumeLixeira(2.0, 1.5, 2.0);
-    Serial.println("Leitura 2: ");
-    Serial.print(leituraDois);
-    Serial.println(" Litros");
-
-    float volumeOcupado = leituraUm - leituraDois;
-    //float volumeOcupadoPorCento = (volumeOcupado * 100)/volumeLixeira;
-
-    // configLCD
-    lcd.setCursor(0, 0);
-    lcd.print("Ocupado: ");
+    double mediaDosVolumes = (volumeUm + volumeDois) / 2;
+    delay(6000);
+    double volumeCaixaVazia = larguraCaixa * alturaCaixa * comprimentoCaixa;
+    double porcentoOcupado = (mediaDosVolumes * 100) / volumeCaixaVazia;
+    //configLCD
+    lcd.setCursor(0,0);
+    lcd.print("Volume Ocupado: ");
     lcd.print("        ");
-    lcd.setCursor(9, 0);
-    lcd.print(volumeOcupadoPorCento);
-    }
-    contador++;
-
+    lcd.setCursor(0,1);
+    lcd.print(porcentoOcupado);
 }
 
-float volumeLixeira(float altTotal, float largura, float comprimento)
-{
-    // Todos os valores estão em metros.
-    leituraSensorUltrassonicoUm();
-    altVariavel = altTotal - altSensor;
 
-    double volumeAtual = largura * comprimento * altVariavel;
-    return volumeAtual;
-}
 
-long leituraSensorUltrassonicoUm()
-{
+
+long alturaUm(){
     digitalWrite(trig, LOW);
     delayMicroseconds(2);
     digitalWrite(trig, HIGH);
     delayMicroseconds(10);
-    digitalWrite(trig, LOW);
+    digitalWrite(trig,LOW);
+  
+    duracao=pulseIn(echo, HIGH);
+    duracao=(double)duracao;
+    altura =(duracao/2) / 29.1;
+    return altura;
+}
 
-    duracao = pulseIn(echo, HIGH);
-    duracao = (double)duracao;
-    altSensor = (duracao / 2) / 29.1;
-    altSensor /= 100;
+
+long alturaDois(){
+    digitalWrite(trig2, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trig2, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trig2,LOW);
+  
+    duracao=pulseIn(echo2, HIGH);
+    duracao=(double)duracao;
+    altura =(duracao/2) / 29.1;
+    return altura;
+  }
+
+float calculaVolume(float alturaLida) {
+    float volume = alturaLida * comprimentoCaixa * larguraCaixa;
+    return volume;
 }
