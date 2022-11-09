@@ -9,12 +9,19 @@ float const trig=11;
 float const echo2 = 7;
 float const trig2 = 6;
 
-double altura, leituraUm, leituraDois, duracao;
 
-double larguraCaixa = 30; 
-double comprimentoCaixa = 20;
-double alturaCaixa = 40;
+//20x17.5x21.5
+double larguraCaixa = 20; 
+double comprimentoCaixa = 17.5;
+double alturaCaixa = 21.5;
+double volumeCaixa = 20 * 17.5 * 21.5; //7525cm³
+
+long leituraUm, leituraDois;
 long alturaLida;
+
+long duracao,altura;
+long duracaoDois, altura2;
+
 void setup(){
 	lcd.begin(16,2);
 	lcd.clear(); 
@@ -30,23 +37,25 @@ void loop(){
     leituraUm = alturaUm();
     leituraDois = alturaDois();
     
-    double volumeUm = calculaVolume(leituraUm);
+  	Serial.println(leituraUm);
+  	Serial.println(leituraDois);
+    
+  	double volumeUm = calculaVolume(leituraUm);
     double volumeDois = calculaVolume(leituraDois);
 
     double mediaDosVolumes = (volumeUm + volumeDois) / 2;
-    delay(6000);
-    double volumeCaixaVazia = larguraCaixa * alturaCaixa * comprimentoCaixa;
-    double porcentoOcupado = (mediaDosVolumes * 100) / volumeCaixaVazia;
-    //configLCD
+    delay(3000);
+	
+  	
+  
+    double porcentoOcupado = (mediaDosVolumes * 100) / volumeCaixa;
+    
     lcd.setCursor(0,0);
     lcd.print("Volume Ocupado: ");
     lcd.print("        ");
     lcd.setCursor(0,1);
     lcd.print(porcentoOcupado);
 }
-
-
-
 
 long alturaUm(){
     digitalWrite(trig, LOW);
@@ -56,7 +65,6 @@ long alturaUm(){
     digitalWrite(trig,LOW);
   
     duracao=pulseIn(echo, HIGH);
-    duracao=(double)duracao;
     altura =(duracao/2) / 29.1;
     return altura;
 }
@@ -69,13 +77,12 @@ long alturaDois(){
     delayMicroseconds(10);
     digitalWrite(trig2,LOW);
   
-    duracao=pulseIn(echo2, HIGH);
-    duracao=(double)duracao;
-    altura =(duracao/2) / 29.1;
-    return altura;
-  }
+    duracaoDois=pulseIn(echo2, HIGH);
+    altura2 =(duracaoDois/2) / 29.1;
+    return altura2;
+}
 
-float calculaVolume(float alturaLida) {
-    float volume = alturaLida * comprimentoCaixa * larguraCaixa;
+double calculaVolume(float alturaLida) {
+    double volume = alturaLida * comprimentoCaixa * larguraCaixa;
     return volume;
 }
